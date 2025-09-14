@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Management Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 90%;
+            max-width: 900px;
+            min-height: 600px;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"], input[type="password"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .chat-area {
+            height: 300px;
+            overflow-y: auto;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .message.announcement {
+            background: linear-gradient(45deg, #ffecd2, #fcb69f);
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .message-header {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .user-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .online-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen">
+            <div class="header">
+                <h1>Team Management Portal</h1>
+                <p>Please login to continue</p>
+            </div>
+            <div class="content">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                <button class="btn" onclick="login()">Login</button>
+                <div id="loginError" class="error hidden"></div>
+            </div>
+        </div>
+
+        <!-- Display Name Screen -->
+        <div id="displayNameScreen" class="hidden">
+            <div class="header">
+                <h1>Welcome!</h1>
+                <p>Please enter your display name</p>
+            </div>
+            <div class="content">
+                <div class="form-group">
+                    <label for="displayName">Display Name:</label>
+                    <input type="text" id="displayName" placeholder="Enter your display name">
+                </div>
+                <button class="btn" onclick="setDisplayName()">Continue</button>
+                <div id="displayNameError" class="error hidden"></div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden">
+            <div class="header">
+                <h1>Comp Directors Admin Panel</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <div class="content">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('accounts')">Manage Accounts</button>
+                    <button class="tab" onclick="switchTab('announcements')">Announcements</button>
+                    <button class="tab" onclick="switchTab('allchats')">All Team Chats</button>
+                </div>
+
+                <!-- Account Management Tab -->
+                <div id="accountsTab">
+                    <h3>Create New Account</h3>
+                    <div class="form-group">
+                        <label for="newUsername">Username:</label>
+                        <input type="text" id="newUsername" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Password:</label>
+                        <input type="password" id="newPassword" placeholder="Enter password">
+                    </div>
+                    <button class="btn" onclick="createAccount()">Create Account</button>
+                    <div id="createAccountMsg" class="hidden"></div>
+
+                    <div class="user-list">
+                        <h3>Existing Accounts</h3>
+                        <div id="accountsList"></div>
+                    </div>
+                </div>
+
+                <!-- Announcements Tab -->
+                <div id="announcementsTab" class="hidden">
+                    <h3>Post Announcement</h3>
+                    <div class="form-group">
+                        <label for="announcementText">Announcement:</label>
+                        <textarea id="announcementText" rows="4" placeholder="Enter your announcement"></textarea>
+                    </div>
+                    <button class="btn" onclick="postAnnouncement()">Post Announcement</button>
+                    <div id="announcementMsg" class="hidden"></div>
+
+                    <div class="chat-area" id="adminAnnouncementView"></div>
+                </div>
+
+                <!-- All Team Chats Tab -->
+                <div id="allChatsTab" class="hidden">
+                    <h3>Monitor All Team Chats</h3>
+                    <div class="form-group">
+                        <label for="teamSelect">Select Team:</label>
+                        <select id="teamSelect" onchange="switchTeamChat()">
+                            <option value="">Select a team...</option>
+                        </select>
+                    </div>
+                    <div id="selectedTeamChat">
+                        <div class="chat-area" id="adminChatView"></div>
+                        <div class="form-group">
+                            <input type="text" id="adminChatMessage" placeholder="Type message as Comp Directors..." onkeypress="handleAdminChatKeyPress(event)">
+                            <button class="btn" onclick="sendAdminChatMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Dashboard -->
+        <div id="userDashboard" class="hidden">
+            <div class="header">
+                <h1>Team Communication</h1>
+                <div>Welcome, <span id="currentDisplayName"></span>!</div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <div class="content">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchUserTab('announcements')">Announcements</button>
+                    <button class="tab" onclick="switchUserTab('chat')">Team Chat</button>
+                </div>
+
+                <!-- Announcements Tab -->
+                <div id="userAnnouncementsTab">
+                    <div class="chat-area" id="userAnnouncementView"></div>
+                </div>
+
+                <!-- Chat Tab -->
+                <div id="userChatTab" class="hidden">
+                    <div class="chat-area" id="chatArea"></div>
+                    <div class="form-group">
+                        <input type="text" id="chatMessage" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
+                        <button class="btn" onclick="sendChatMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In-memory data storage
+        let accounts = [
+            { username: 'Comp Directors', password: 'compdir45', isAdmin: true }
+        ];
+        let announcements = [];
+        let chatMessages = {}; // Organized by account username
+        let currentUser = null;
+        let currentDisplayName = null;
+        
+        // Vercel API endpoint for Discord webhook
+        const WEBHOOK_URL = '/api/discord-webhook';
+
+        async function sendLoginWebhook(username, displayName = null) {
+            const loginData = {
+                username: username,
+                displayName: displayName
+            };
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                if (response.ok) {
+                    console.log('Discord webhook sent successfully');
+                } else {
+                    console.log('Discord webhook failed');
+                }
+            } catch (error) {
+                console.log('Discord webhook error:', error);
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!username || !password) {
+                showError(errorDiv, 'Please enter both username and password');
+                return;
+            }
+
+            const user = accounts.find(acc => acc.username === username && acc.password === password);
+            
+            if (user) {
+                currentUser = user;
+                
+                // Send login webhook
+                await sendLoginWebhook(username);
+                
+                document.getElementById('loginScreen').classList.add('hidden');
+                
+                if (user.isAdmin) {
+                    showAdminDashboard();
+                } else {
+                    document.getElementById('displayNameScreen').classList.remove('hidden');
+                }
+                
+                hideError(errorDiv);
+            } else {
+                showError(errorDiv, 'Invalid username or password');
+            }
+        }
+
+        async function setDisplayName() {
+            const displayName = document.getElementById('displayName').value.trim();
+            const errorDiv = document.getElementById('displayNameError');
+
+            if (!displayName) {
+                showError(errorDiv, 'Please enter a display name');
+                return;
+            }
+
+            currentDisplayName = displayName;
+            
+            // Send webhook with display name
+            await sendLoginWebhook(currentUser.username, displayName);
+            
+            document.getElementById('displayNameScreen').classList.add('hidden');
+            showUserDashboard();
+            hideError(errorDiv);
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            updateAccountsList();
+            updateAdminAnnouncementView();
+            updateTeamSelect();
+        }
+
+        function showUserDashboard() {
+            document.getElementById('userDashboard').classList.remove('hidden');
+            document.getElementById('currentDisplayName').textContent = currentDisplayName;
+            updateUserAnnouncementView();
+            updateChatArea();
+        }
+
+        function createAccount() {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const msgDiv = document.getElementById('createAccountMsg');
+
+            if (!username || !password) {
+                showError(msgDiv, 'Please enter both username and password');
+                return;
+            }
+
+            if (accounts.find(acc => acc.username === username)) {
+                showError(msgDiv, 'Username already exists');
+                return;
+            }
+
+            accounts.push({ username, password, isAdmin: false });
+            
+            // Initialize chat messages for this account
+            chatMessages[username] = [];
+            
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            
+            showSuccess(msgDiv, 'Account created successfully');
+            updateAccountsList();
+            updateTeamSelect();
+        }
+
+        function deleteAccount(username) {
+            if (username === 'Comp Directors') {
+                alert('Cannot delete admin account');
+                return;
+            }
+            
+            accounts = accounts.filter(acc => acc.username !== username);
+            delete chatMessages[username]; // Remove chat history
+            updateAccountsList();
+            updateTeamSelect();
+        }
+
+        function updateAccountsList() {
+            const list = document.getElementById('accountsList');
+            list.innerHTML = '';
+
+            accounts.forEach(account => {
+                if (!account.isAdmin) {
+                    const item = document.createElement('div');
+                    item.className = 'user-item';
+                    item.innerHTML = `
+                        <div>
+                            <strong>${account.username}</strong>
+                            ${account.isAdmin ? ' (Admin)' : ''}
+                        </div>
+                        <button class="btn btn-secondary" onclick="deleteAccount('${account.username}')">Delete</button>
+                    `;
+                    list.appendChild(item);
+                }
+            });
+        }
+
+        function updateTeamSelect() {
+            const select = document.getElementById('teamSelect');
+            if (!select) return; // Guard clause in case element doesn't exist yet
+            
+            select.innerHTML = '<option value="">Select a team...</option>';
+
+            accounts.forEach(account => {
+                if (!account.isAdmin) {
+                    const option = document.createElement('option');
+                    option.value = account.username;
+                    option.textContent = account.username;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function postAnnouncement() {
+            const text = document.getElementById('announcementText').value.trim();
+            const msgDiv = document.getElementById('announcementMsg');
+
+            if (!text) {
+                showError(msgDiv, 'Please enter an announcement');
+                return;
+            }
+
+            const announcement = {
+                id: Date.now(),
+                text: text,
+                timestamp: new Date().toLocaleString(),
+                author: 'Comp Directors'
+            };
+
+            announcements.unshift(announcement);
+            document.getElementById('announcementText').value = '';
+            
+            showSuccess(msgDiv, 'Announcement posted successfully');
+            updateAdminAnnouncementView();
+            updateUserAnnouncementView();
+        }
+
+        function updateAdminAnnouncementView() {
+            const view = document.getElementById('adminAnnouncementView');
+            updateAnnouncementView(view);
+        }
+
+        function updateUserAnnouncementView() {
+            const view = document.getElementById('userAnnouncementView');
+            updateAnnouncementView(view);
+        }
+
+        function updateAnnouncementView(view) {
+            if (!view) return;
+            view.innerHTML = '';
+            
+            if (announcements.length === 0) {
+                view.innerHTML = '<p>No announcements yet.</p>';
+                return;
+            }
+
+            announcements.forEach(announcement => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message announcement';
+                msgDiv.innerHTML = `
+                    <div class="message-header">📢 ${announcement.author} - ${announcement.timestamp}</div>
+                    <div>${announcement.text}</div>
+                `;
+                view.appendChild(msgDiv);
+            });
+        }
+
+        function sendChatMessage() {
+            const messageText = document.getElementById('chatMessage').value.trim();
+            
+            if (!messageText) return;
+
+            // Initialize chat array for this account if it doesn't exist
+            if (!chatMessages[currentUser.username]) {
+                chatMessages[currentUser.username] = [];
+            }
+
+            const message = {
+                id: Date.now(),
+                text: messageText,
+                timestamp: new Date().toLocaleString(),
+                author: currentDisplayName,
+                username: currentUser.username,
+                accountUsername: currentUser.username
+            };
+
+            chatMessages[currentUser.username].push(message);
+            document.getElementById('chatMessage').value = '';
+            updateChatArea();
+        }
+
+        function sendAdminChatMessage() {
+            const messageText = document.getElementById('adminChatMessage').value.trim();
+            const selectedTeam = document.getElementById('teamSelect').value;
+            
+            if (!messageText || !selectedTeam) return;
+
+            // Initialize chat array for this account if it doesn't exist
+            if (!chatMessages[selectedTeam]) {
+                chatMessages[selectedTeam] = [];
+            }
+
+            const message = {
+                id: Date.now(),
+                text: messageText,
+                timestamp: new Date().toLocaleString(),
+                author: 'Comp Directors',
+                username: 'Comp Directors',
+                accountUsername: selectedTeam,
+                isAdmin: true
+            };
+
+            chatMessages[selectedTeam].push(message);
+            document.getElementById('adminChatMessage').value = '';
+            updateAdminChatView();
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function handleAdminChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendAdminChatMessage();
+            }
+        }
+
+        function updateChatArea() {
+            const chatArea = document.getElementById('chatArea');
+            if (!chatArea) return;
+            chatArea.innerHTML = '';
+
+            const accountMessages = chatMessages[currentUser.username] || [];
+
+            if (accountMessages.length === 0) {
+                chatArea.innerHTML = '<p>No messages yet. Start the conversation!</p>';
+                return;
+            }
+
+            accountMessages.forEach(message => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                const authorDisplay = message.isAdmin ? 
+                    `<span style="color: #dc3545; font-weight: bold;">👑 ${message.author}</span>` : 
+                    message.author;
+                
+                msgDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="online-indicator"></span>
+                        ${authorDisplay} (${message.username}) - ${message.timestamp}
+                    </div>
+                    <div>${message.text}</div>
+                `;
+                chatArea.appendChild(msgDiv);
+            });
+
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function updateAdminChatView() {
+            const chatArea = document.getElementById('adminChatView');
+            const selectedTeam = document.getElementById('teamSelect').value;
+            
+            if (!chatArea) return;
+            
+            if (!selectedTeam) {
+                chatArea.innerHTML = '<p>Please select a team to view their chat.</p>';
+                return;
+            }
+
+            chatArea.innerHTML = '';
+            const accountMessages = chatMessages[selectedTeam] || [];
+
+            if (accountMessages.length === 0) {
+                chatArea.innerHTML = '<p>No messages in this team chat yet.</p>';
+                return;
+            }
+
+            accountMessages.forEach(message => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                const authorDisplay = message.isAdmin ? 
+                    `<span style="color: #dc3545; font-weight: bold;">👑 ${message.author}</span>` : 
+                    message.author;
+                
+                msgDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="online-indicator"></span>
+                        ${authorDisplay} (${message.username}) - ${message.timestamp}
+                    </div>
+                    <div>${message.text}</div>
+                `;
+                chatArea.appendChild(msgDiv);
+            });
+
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function switchTeamChat() {
+            updateAdminChatView();
+        }
+
+        function switchTab(tab) {
+            // Remove active class from all tabs
+            document.querySelectorAll('#adminDashboard .tab').forEach(t => t.classList.remove('active'));
+            
+            // Hide all tab content
+            document.getElementById('accountsTab').classList.add('hidden');
+            document.getElementById('announcementsTab').classList.add('hidden');
+            document.getElementById('allChatsTab').classList.add('hidden');
+
+            // Show selected tab
+            if (tab === 'accounts') {
+                document.getElementById('accountsTab').classList.remove('hidden');
+                document.querySelectorAll('#adminDashboard .tab')[0].classList.add('active');
+            } else if (tab === 'announcements') {
+                document.getElementById('announcementsTab').classList.remove('hidden');
+                document.querySelectorAll('#adminDashboard .tab')[1].classList.add('active');
+            } else if (tab === 'allchats') {
+                document.getElementById('allChatsTab').classList.remove('hidden');
+                document.querySelectorAll('#adminDashboard .tab')[2].classList.add('active');
+                updateTeamSelect();
+                updateAdminChatView();
+            }
+        }
+
+        function switchUserTab(tab) {
+            // Remove active class from all tabs
+            document.querySelectorAll('#userDashboard .tab').forEach(t => t.classList.remove('active'));
+            
+            // Hide all tab content
+            document.getElementById('userAnnouncementsTab').classList.add('hidden');
+            document.getElementById('userChatTab').classList.add('hidden');
+
+            // Show selected tab
+            if (tab === 'announcements') {
+                document.getElementById('userAnnouncementsTab').classList.remove('hidden');
+                document.querySelectorAll('#userDashboard .tab')[0].classList.add('active');
+            } else if (tab === 'chat') {
+                document.getElementById('userChatTab').classList.remove('hidden');
+                document.querySelectorAll('#userDashboard .tab')[1].classList.add('active');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentDisplayName = null;
+            
+            // Hide all screens
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('userDashboard').classList.add('hidden');
+            document.getElementById('displayNameScreen').classList.add('hidden');
+            
+            // Show login screen
+            document.getElementById('loginScreen').classList.remove('hidden');
+            
+            // Clear form fields
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('displayName').value = '';
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.className = 'error';
+            element.classList.remove('hidden');
+        }
+
+        function showSuccess(element, message) {
+            element.textContent = message;
+            element.className = 'success';
+            element.classList.remove('hidden');
+            setTimeout(() => element.classList.add('hidden'), 3000);
+        }
+
+        function hideError(element) {
+            element.classList.add('hidden');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAccountsList();
+            updateTeamSelect();
+        });
+    </script>
+</body>
+</html>
