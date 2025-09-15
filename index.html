@@ -320,13 +320,6 @@
             <h1 class="logo">Project Marco</h1>
             <p class="subtitle">Competitive Portal</p>
         </div>
-        
-        <div class="content">
-            <div class="time-section">
-                <h2 class="time-title">Your Local Time</h2>
-                <p class="time-display" id="current-time">Loading...</p>
-                <p class="time-display"
-            </div>
 
             <div class="countdown-section">
                 <h2 class="countdown-title">Portal Update Launching In:</h2>
@@ -350,8 +343,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="update-info">                
                 <div class="whats-new">
                     <h3>What's New</h3>
                     <h4>Team Registration System</h4>
@@ -416,14 +407,22 @@
         }
 
         function updateTimeDisplay() {
-            const now = new Date();
-            document.getElementById('current-time').textContent = 
-                `Current Time: ${now.toLocaleTimeString()} (${now.toLocaleDateString()})`;
 
             const elapsed = Math.floor((now.getTime() - startTime) / 1000);
             const hours = Math.floor(elapsed / 3600);
             const minutes = Math.floor((elapsed % 3600) / 60);
             const seconds = elapsed % 60;
+            
+            let elapsedString = 'Time since page loaded: ';
+            if (hours > 0) {
+                elapsedString += `${hours}h `;
+            }
+            if (minutes > 0 || hours > 0) {
+                elapsedString += `${minutes}m `;
+            }
+            elapsedString += `${seconds}s`;
+            
+            document.getElementById('elapsed-time').textContent = elapsedString;
         }
 
         function showNotification(message) {
@@ -457,36 +456,6 @@
             const randomMessage = messages[Math.floor(Math.random() * messages.length)];
             showNotification(randomMessage);
         }, 25000); // Every 25 seconds
-
-        // Add some interactive effects
-        document.addEventListener('mousemove', (e) => {
-            const cursor = document.createElement('div');
-            cursor.style.cssText = `
-                position: absolute;
-                width: 4px;
-                height: 4px;
-                background: rgba(102, 126, 234, 0.6);
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 9999;
-                left: ${e.clientX}px;
-                top: ${e.clientY}px;
-                animation: cursorFade 1s ease-out forwards;
-            `;
-            document.body.appendChild(cursor);
-            
-            setTimeout(() => cursor.remove(), 1000);
-        });
-
-        // Add cursor fade animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes cursorFade {
-                0% { opacity: 1; transform: scale(1); }
-                100% { opacity: 0; transform: scale(0); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
