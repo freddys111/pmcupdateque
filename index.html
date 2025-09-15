@@ -153,6 +153,27 @@
             letter-spacing: 1px;
         }
 
+        .time-section {
+            margin-bottom: 40px;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .time-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .time-display {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
         .update-info {
             background: linear-gradient(145deg, #f8f9fa, #e9ecef);
             border-radius: 15px;
@@ -197,6 +218,34 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
+        }
+
+        .whats-new {
+            text-align: left;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .whats-new h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .whats-new h4 {
+            font-size: 1.2rem;
+            color: #667eea;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .whats-new p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
         }
 
         .progress-bar {
@@ -273,6 +322,12 @@
         </div>
         
         <div class="content">
+            <div class="time-section">
+                <h2 class="time-title">Your Local Time</h2>
+                <p class="time-display" id="current-time">Loading...</p>
+                <p class="time-display"
+            </div>
+
             <div class="countdown-section">
                 <h2 class="countdown-title">Portal Update Launching In:</h2>
                 
@@ -296,21 +351,16 @@
                 </div>
             </div>
 
-            <div class="update-info">
-                <h3 class="update-title">🎮 What's Coming Next</h3>
-                <p class="update-description">
-                    We're preparing something extraordinary for the competitive gaming community. 
-                    Our enhanced portal will revolutionize how teams collaborate and compete.
-                </p>
-                
-                <ul class="features-list">
-                    <li>Advanced Team Management System</li>
-                    <li>Real-time Communication Channels</li>
-                    <li>Competition Tracking & Analytics</li>
-                    <li>Enhanced Security & Authentication</li>
-                    <li>Mobile-Optimized Experience</li>
-                    <li>Live Tournament Integration</li>
-                </ul>
+            <div class="update-info">                
+                <div class="whats-new">
+                    <h3>What's New</h3>
+                    <h4>Team Registration System</h4>
+                    <p>Teams can now register directly through the website! Your team will appear on the leaderboards once it receives official status.</p>
+                    <h4>Competition Codes Hub</h4>
+                    <p>This channel will serve as your primary source for comp codes until we launch the dedicated website section (coming soon).</p>
+                    <h4>Centralized Announcements</h4>
+                    <p>We're transitioning all major announcements to the website to create a better experience for our competitive community. This means more comprehensive updates and easier access to important information.</p>
+                </div>
 
                 <div class="progress-bar">
                     <div class="progress-fill"></div>
@@ -322,8 +372,6 @@
             </div>
 
             <p class="footer-text">
-                Stay tuned for the ultimate competitive gaming experience. 
-                <br>Something big is coming... 🏆
             </p>
         </div>
     </div>
@@ -335,7 +383,8 @@
     <script>
         // Set target date - change this to your desired launch date
         // Format: Month/Day/Year Hour:Minute:Second
-        const targetDate = new Date('01/15/2025 12:00:00').getTime();
+        const targetDate = new Date('09/15/2025 18:00:00').getTime();
+        const startTime = new Date().getTime();
 
         function updateCountdown() {
             const now = new Date().getTime();
@@ -366,6 +415,17 @@
             }
         }
 
+        function updateTimeDisplay() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                `Current Time: ${now.toLocaleTimeString()} (${now.toLocaleDateString()})`;
+
+            const elapsed = Math.floor((now.getTime() - startTime) / 1000);
+            const hours = Math.floor(elapsed / 3600);
+            const minutes = Math.floor((elapsed % 3600) / 60);
+            const seconds = elapsed % 60;
+        }
+
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -376,9 +436,13 @@
             }, 5000);
         }
 
-        // Update countdown every second
+        // Update countdown and time every second
         updateCountdown();
-        setInterval(updateCountdown, 1000);
+        updateTimeDisplay();
+        setInterval(() => {
+            updateCountdown();
+            updateTimeDisplay();
+        }, 1000);
 
         // Show periodic notifications
         setInterval(() => {
