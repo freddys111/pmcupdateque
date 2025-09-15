@@ -1,1 +1,14 @@
-
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
+}
